@@ -4,9 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using NUnit.Framework;
-#if PROMV2
-using Prometheus.Advanced;
-#endif
+
 using Prometheus.DotNetRuntime.StatsCollectors;
 
 namespace Prometheus.DotNetRuntime.Tests
@@ -135,11 +133,7 @@ namespace Prometheus.DotNetRuntime.Tests
         }
 
         private async Task Assert_Expected_Stats_Are_Present_In_Registry(
-#if PROMV2
-            DefaultCollectorRegistry registry
-#else
             CollectorRegistry registry
-#endif
         )
         {
             // arrange
@@ -165,18 +159,6 @@ namespace Prometheus.DotNetRuntime.Tests
             }
         }
         
-#if PROMV2
-        private DefaultCollectorRegistry NewRegistry()
-        {
-            return new DefaultCollectorRegistry();
-        }
-
-        private DefaultCollectorRegistry GetDefaultRegistry()
-        {
-            return DefaultCollectorRegistry.Instance;
-        }
-        
-#elif PROMV3
         private CollectorRegistry NewRegistry()
         {
             return Metrics.NewCustomRegistry();
@@ -186,7 +168,5 @@ namespace Prometheus.DotNetRuntime.Tests
         {
             return Metrics.DefaultRegistry;
         }
-#endif
-        
     }
 }

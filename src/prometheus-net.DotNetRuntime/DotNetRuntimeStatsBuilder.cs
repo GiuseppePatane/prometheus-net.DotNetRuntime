@@ -3,11 +3,6 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using Prometheus.DotNetRuntime.StatsCollectors;
 using Prometheus.DotNetRuntime.StatsCollectors.Util;
-#if PROMV2
-using TCollectorRegistry = Prometheus.Advanced.DefaultCollectorRegistry;
-#elif PROMV3
-using TCollectorRegistry = Prometheus.CollectorRegistry;
-#endif
 
 namespace Prometheus.DotNetRuntime
 {
@@ -57,11 +52,7 @@ namespace Prometheus.DotNetRuntime
             /// <returns></returns>
             public IDisposable StartCollecting()
             {
-#if PROMV2
-                return StartCollecting(TCollectorRegistry.Instance);
-#elif PROMV3
                 return StartCollecting(Metrics.DefaultRegistry);
-#endif
             }
 
             /// <summary>
@@ -70,15 +61,11 @@ namespace Prometheus.DotNetRuntime
             /// </summary>
             /// <param name="registry">Registry where metrics will be collected</param>
             /// <returns></returns>
-            public IDisposable StartCollecting(TCollectorRegistry registry)
+            public IDisposable StartCollecting(CollectorRegistry registry)
             {
                 var runtimeStatsCollector = new DotNetRuntimeStatsCollector(StatsCollectors.ToImmutableHashSet(), _errorHandler, _debugMetrics, registry);
-#if PROMV2
-                registry.RegisterOnDemandCollectors(runtimeStatsCollector);
-#elif PROMV3
                 runtimeStatsCollector.RegisterMetrics(registry);
                 registry.AddBeforeCollectCallback(runtimeStatsCollector.UpdateMetrics);
-#endif
 
                 return runtimeStatsCollector;
             }

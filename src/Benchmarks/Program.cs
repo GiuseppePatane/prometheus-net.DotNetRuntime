@@ -37,7 +37,7 @@ namespace Benchmarks
                             .WithLaunchCount(3)
                             .WithWarmupCount(1)
                             .WithIterationTime(TimeInterval.FromSeconds(10))
-                            .WithCustomBuildConfiguration("ReleaseV3")
+                            .WithCustomBuildConfiguration("Release")
                             .WithOutlierMode(OutlierMode.DontRemove)
                     )
                     .With(MemoryDiagnoser.Default)

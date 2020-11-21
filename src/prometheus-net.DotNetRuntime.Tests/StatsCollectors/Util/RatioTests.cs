@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
-#if PROMV2
-using Prometheus.Advanced;    
-#endif
 using Prometheus.DotNetRuntime.StatsCollectors.Util;
 
 namespace Prometheus.DotNetRuntime.Tests.StatsCollectors.Util
@@ -18,11 +15,7 @@ namespace Prometheus.DotNetRuntime.Tests.StatsCollectors.Util
         [SetUp]
         public void SetUp()
         {
-#if PROMV2
-            _metricFactory = new MetricFactory(new DefaultCollectorRegistry());
-#elif PROMV3
             _metricFactory = Metrics.WithCustomRegistry(Metrics.NewCustomRegistry());
-#endif
         }
         
         [Test]

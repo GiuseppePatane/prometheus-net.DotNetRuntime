@@ -6,31 +6,23 @@ using System.Reflection;
 using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
-#if PROMV2
-using Prometheus.Advanced;
-using TCollectorRegistry = Prometheus.Advanced.ICollectorRegistry;
-#elif PROMV3
-using TCollectorRegistry = Prometheus.CollectorRegistry;
-#endif
+
 
 namespace Prometheus.DotNetRuntime
 {
     internal sealed class DotNetRuntimeStatsCollector : 
         IDisposable
-#if PROMV2
-        , IOnDemandCollector
-#endif
     {
-        private static readonly Dictionary<TCollectorRegistry, DotNetRuntimeStatsCollector> Instances = new Dictionary<TCollectorRegistry, DotNetRuntimeStatsCollector>();
+        private static readonly Dictionary<CollectorRegistry, DotNetRuntimeStatsCollector> Instances = new Dictionary<CollectorRegistry, DotNetRuntimeStatsCollector>();
         
         private DotNetEventListener[] _eventListeners;
         private readonly ImmutableHashSet<IEventSourceStatsCollector> _statsCollectors;
         private readonly bool _enabledDebugging;
         private readonly Action<Exception> _errorHandler;
-        private readonly TCollectorRegistry _registry;
+        private readonly CollectorRegistry _registry;
         private readonly object _lockInstance = new object();
 
-        internal DotNetRuntimeStatsCollector(ImmutableHashSet<IEventSourceStatsCollector> statsCollectors, Action<Exception> errorHandler, bool enabledDebugging, TCollectorRegistry registry)
+        internal DotNetRuntimeStatsCollector(ImmutableHashSet<IEventSourceStatsCollector> statsCollectors, Action<Exception> errorHandler, bool enabledDebugging, CollectorRegistry registry)
         {
             _statsCollectors = statsCollectors;
             _enabledDebugging = enabledDebugging;
@@ -47,14 +39,10 @@ namespace Prometheus.DotNetRuntime
             }
         }
 
-        public void RegisterMetrics(TCollectorRegistry registry)
-        {   
-#if PROMV2
-            var metrics = new MetricFactory(registry);
-#elif PROMV3
+        public void RegisterMetrics(CollectorRegistry registry)
+        {
             var metrics = Metrics.WithCustomRegistry(registry);
-#endif
-            
+
             foreach (var sc in _statsCollectors)
             {
                 sc.RegisterMetrics(metrics);

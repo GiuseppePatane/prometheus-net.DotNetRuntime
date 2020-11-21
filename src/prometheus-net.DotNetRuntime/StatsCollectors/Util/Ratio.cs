@@ -1,9 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-#if PROMV2
-using Prometheus.Advanced;
-#endif
+
 
 namespace Prometheus.DotNetRuntime.StatsCollectors.Util
 {

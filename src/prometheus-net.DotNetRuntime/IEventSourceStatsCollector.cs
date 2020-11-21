@@ -1,8 +1,5 @@
 using System;
 using System.Diagnostics.Tracing;
-#if PROMV2
-using Prometheus.Advanced;
-#endif
 using Prometheus.DotNetRuntime.EventSources;
 
 namespace Prometheus.DotNetRuntime

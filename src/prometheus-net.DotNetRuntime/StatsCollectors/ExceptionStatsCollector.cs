@@ -1,9 +1,6 @@
 ﻿using Prometheus.DotNetRuntime.EventSources;
 using System;
 using System.Diagnostics.Tracing;
-#if PROMV2
-using Prometheus.Advanced;
-#endif
 
 
 namespace Prometheus.DotNetRuntime.StatsCollectors
