@@ -1,0 +1,81 @@
+# Summary for V4
+Main goals of next release:
+- As this library is now in greater use, improve the currently poor baseline performance
+- Fix longstanding issues (e.g. ThreadPoolStatsCollector doesn't work)
+- Make use of all events currently being collected by current level of verbosity
+- Keep compatability with .NET core v3
+- Remove support for v2 of prometheus-net
+- Fix long-running perf bug
+
+
+## Improving performance
+Main cost involves the .NET runtime producing events, not processing them so we need to be smarter about when we enable the more verbose event sources. Ideas include:
+- Using event counters
+- Dynamic switching of metric sources
+
+### Using event counters
+Event counters should place a much lower stress on the runtime- using these could definitely help.
+
+### Dynamic switching of metric sources
+Overall could be three levels of detail for most sources, ordered in terms of perf impact (low -> high):
+1. Counters
+2. Events (info)
+3. Events (verbose)
+
+Depending on the information a user wishes to obtain, switching between these three verbosity levels could be useful. Scenarios include:
+- Disabling more detailed collectors by default
+- Enabling/ disabling collectors as conditions change (e.g. a lot of exceptions are thrown then disable high-impact collection, enabling detailed thread stats when thread pool queue times increase)
+
+IDEAS:
+- State change based on repetitive duration of time
+- State change based on value of event counters (e.g. bytes jitted > x for y seconds)
+- State change based on rate of events received (e.g. > 100/sec, then disable events for x seconds)
+- Premade profiles (e.g. perf vs investigation)
+- Need to track what collectors are enabled and at what level of verbosity
+- Will need to completely redesign the construction of event listeners
+
+## Collector improvements
+Overall:
+- Make full use of all events captured by current verbosity levels
+- Upgrade to the latest version of events
+
+### GC
+- Track finalizer processing times
+- Track mark events (GcMarkWithType) to track the types of roots that hold memory
+- Track pinned object heap size (heapstats v3)
+- Track allocations more effeciently (don't use Verbose keyword). Can we support this in V3 of .NET core?
+- GCHeapSurvivalAndMovementKeyword to track reserved sizes of heaps and positions
+- Look into GCGlobalHeapHistory_V3?
+- Track compactions?
+
+### Execeptions
+- Track times spent throwing + time spent handling events
+- Offer fallback to the count event counter
+
+### JIT
+- _ilBytesJittedCounter to track bytes spent
+- Offer to track greater verbosity?
+
+### RuntimeInformation?
+
+### [EventSource()] in coreclr
+Possible ideas:
+- HttpClient (time queued, connection count, etc)
+- Dependency injection
+- DNS lookups
+
+Ideas to reduce CPU consumpton:
+- don't track JIT on startup
+- don't track TP stats unless unhealthy (e.g. too many queued tasks)
+- don't track contention stats unless lots of contention
+- don't track exceptions unless count is 
+
+For each source of info, offer options to:
+- increase verbosity (more detailed log events, e.g. alloc by heap)
+- upgrade from event counters -> event traces 
+- downgrade from event traces -> counters
+- disable collectors entirely 
+
+# Collector improvements
+## GC
+- Collect heap info
