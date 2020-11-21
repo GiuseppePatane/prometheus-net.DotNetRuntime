@@ -83,7 +83,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 1,
       "description": "The percentage of available CPU resources consumed.",
       "format": "percentunit",
@@ -165,7 +165,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 1,
       "description": "The percentage of time that the application was paused to allow the garbage collector to run.",
       "format": "percentunit",
@@ -247,7 +247,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 1,
       "description": "The percentage of total process CPU utilization that was dedicated to performing garbage collections.",
       "format": "percentunit",
@@ -329,7 +329,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": 1,
       "description": "The percentage of CPU utilization that was dedicated to compiling methods by the Just In Time (JIT) compiler.",
       "format": "percentunit",
@@ -411,7 +411,7 @@
         "rgba(237, 129, 40, 0.89)",
         "#d44a3a"
       ],
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "decimals": null,
       "description": "The delay between when a job is scheduled for execution on the thread pool and when it starts execution. Measurement taken from the 90th percentile.",
       "format": "s",
@@ -502,7 +502,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "fill": 1,
       "gridPos": {
         "h": 8,
@@ -587,7 +587,7 @@
       "bars": true,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "fill": 1,
       "gridPos": {
         "h": 8,
@@ -680,7 +680,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "description": "",
       "fill": 1,
       "gridPos": {
@@ -776,7 +776,7 @@
       "bars": true,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "fill": 1,
       "gridPos": {
         "h": 8,
@@ -872,7 +872,7 @@
         "mode": "spectrum"
       },
       "dataFormat": "tsbuckets",
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "gridPos": {
         "h": 8,
         "w": 8,
@@ -928,7 +928,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "fill": 1,
       "gridPos": {
         "h": 8,
@@ -1035,7 +1035,7 @@
         "mode": "spectrum"
       },
       "dataFormat": "tsbuckets",
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "gridPos": {
         "h": 8,
         "w": 8,
@@ -1092,7 +1092,7 @@
       "cacheTimeout": null,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "fill": 1,
       "gridPos": {
         "h": 8,
@@ -1176,7 +1176,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "fill": 1,
       "gridPos": {
         "h": 8,
@@ -1275,7 +1275,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "fill": 1,
       "gridPos": {
         "h": 8,
@@ -1368,7 +1368,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "fill": 1,
       "gridPos": {
         "h": 8,
@@ -1467,7 +1467,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "fill": 1,
       "gridPos": {
         "h": 8,
@@ -1553,7 +1553,7 @@
       "bars": false,
       "dashLength": 10,
       "dashes": false,
-      "datasource": "${DS_PROMETHEUS}",
+      "datasource": "Prometheus",
       "fill": 1,
       "gridPos": {
         "h": 8,
@@ -1644,7 +1644,7 @@
       {
         "allValue": null,
         "current": {},
-        "datasource": "${DS_PROMETHEUS}",
+        "datasource": "Prometheus",
         "definition": "dotnet_build_info",
         "hide": 0,
         "includeAll": false,
@@ -1665,9 +1665,9 @@
       }
     ]
   },
-  "time": {
-    "from": "2019-08-04T03:15:57.203Z",
-    "to": "2019-08-04T12:04:02.670Z"
+   "time": {
+    "from": "now-30m",
+    "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [
