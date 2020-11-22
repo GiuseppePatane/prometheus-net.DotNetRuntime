@@ -43,7 +43,7 @@ namespace Prometheus.DotNetRuntime
         {
             private Action<Exception> _errorHandler;
             private bool _debugMetrics;
-            internal HashSet<IEventSourceStatsCollector> StatsCollectors { get; } = new HashSet<IEventSourceStatsCollector>(new TypeEquality<IEventSourceStatsCollector>());
+            internal HashSet<IEventSourceCollector> StatsCollectors { get; } = new HashSet<IEventSourceCollector>(new TypeEquality<IEventSourceCollector>());
 
             /// <summary>
             /// Finishes configuration and starts collecting .NET runtime metrics. Returns a <see cref="IDisposable"/> that
@@ -146,7 +146,7 @@ namespace Prometheus.DotNetRuntime
                 return this;
             }
 
-            public Builder WithCustomCollector(IEventSourceStatsCollector statsCollector)
+            public Builder WithCustomCollector(IEventSourceCollector statsCollector)
             {
                 StatsCollectors.AddOrReplace(statsCollector);
                 return this;

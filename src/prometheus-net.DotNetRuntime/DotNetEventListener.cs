@@ -1,5 +1,6 @@
 using Prometheus.DotNetRuntime.StatsCollectors.Util;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 
@@ -10,12 +11,12 @@ namespace Prometheus.DotNetRuntime
         private static Counter _eventTypeCounts;
         private static Counter _cpuConsumed;
 
-        private readonly IEventSourceStatsCollector _collector;
+        private readonly IEventSourceCollector _collector;
         private readonly Action<Exception> _errorHandler;
         private readonly bool _enableDebugging;
         private readonly string _nameSnakeCase;
 
-        internal DotNetEventListener(IEventSourceStatsCollector collector, Action<Exception> errorHandler, bool enableDebugging) : base()
+        internal DotNetEventListener(IEventSourceCollector collector, Action<Exception> errorHandler, bool enableDebugging) : base()
         {
             _collector = collector;
             _errorHandler = errorHandler;
@@ -37,7 +38,13 @@ namespace Prometheus.DotNetRuntime
             var es = e.EventSource;
             if (es.Guid == _collector.EventSourceGuid)
             {
-                EnableEvents(es, _collector.Level, _collector.Keywords);
+                var args = new Dictionary<string, string>();
+                if (_collector is IEventSourceCounterCollector counterCollector)
+                {
+                    args["EventCounterIntervalSec"] = counterCollector.RefreshPeriodSeconds.ToString();
+                }
+                
+                EnableEvents(es, _collector.Level, _collector.Keywords, args);
                 StartedReceivingEvents = true;
             }
         }

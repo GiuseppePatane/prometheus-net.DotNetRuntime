@@ -15,16 +15,56 @@ Main cost involves the .NET runtime producing events, not processing them so we 
 
 ### Using event counters
 Event counters should place a much lower stress on the runtime- using these could definitely help.
+See https://docs.microsoft.com/en-us/dotnet/core/diagnostics/event-counters#sample-code.
+
+Counter implementation concerns:
+- Rate is fixed ahead of time (min frequency = 1 sec)
+- Counter values are collected separately from other events (need to provide mechanism for other profilers to consume counter values)
+- Perhaps event listeners consume counters?
 
 ### Dynamic switching of metric sources
 Overall could be three levels of detail for most sources, ordered in terms of perf impact (low -> high):
 1. Counters
+2. Events (Warning) 
 2. Events (info)
 3. Events (verbose)
 
 Depending on the information a user wishes to obtain, switching between these three verbosity levels could be useful. Scenarios include:
 - Disabling more detailed collectors by default
 - Enabling/ disabling collectors as conditions change (e.g. a lot of exceptions are thrown then disable high-impact collection, enabling detailed thread stats when thread pool queue times increase)
+
+```
+DotNetRuntimeStatsBuilder.LowestImpact.StartCollecting();
+DotNetRuntimeStatsBuilder.AllCollectors.StartCollecting();
+
+Gc.DefaultLevel(Info)
+	.Use.Verbose.When(x => x.allocRate > x, 5 second)
+	.Use.Info.When(x => x.EventsSec > 100)
+	
+// Why are we doing this?
+// To control performance impact of collectors
+// To enable more detail when needed
+// TraceInfo, TraceVerbose
+// Scenarios: 
+// JIT: on startup, when a lot of JIT is happening (e.g. num methods > x)
+// Contention: when number of locks contended > 5, when number of locks isn't greater than 5
+// GC: when LOH > blah size (enable LOH allocs)
+// ThreadPool: When queue length > x, num threads > Environment.ProcessorCount
+// Exceptions: When num exceptions> blah
+
+// Levels: Info, Verbose
+DotNetRuntimeStatsBuilder.Customize()
+	.With.Gc
+	.With.Jit
+	.With.ThreadPoolStats
+		.Use.Detailed.When(x => x.Blah)
+		.Use.Detailed.Always()
+		.Use.Level(Level.Info)
+		.Use.Normal.When(x => x.NumEventsSec > 100)
+	.With.ThreadPoolLatencyStats
+	
+```
+
 
 IDEAS:
 - State change based on repetitive duration of time
@@ -33,6 +73,16 @@ IDEAS:
 - Premade profiles (e.g. perf vs investigation)
 - Need to track what collectors are enabled and at what level of verbosity
 - Will need to completely redesign the construction of event listeners
+- Evaluate every collection (perhaps this will be too long?)
+- Counters have to have their refresh frequency specified up front (default to 1 sec?)
+
+- Counters will be updated at a fixed frequency, we can use this to inform judgments
+- We need to take samples of the queue length via histogram
+- E.g. thread pool, enable detail after we see a queue build up of y
+- Collectors should be ignorant of verbosity changes (managed externally)
+- Collectors need to expose additional information (e.g. counter values to base judgments on)
+
+
 
 ## Collector improvements
 Overall:

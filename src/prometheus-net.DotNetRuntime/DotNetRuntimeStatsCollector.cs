@@ -7,7 +7,6 @@ using System.Runtime;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
-
 namespace Prometheus.DotNetRuntime
 {
     internal sealed class DotNetRuntimeStatsCollector : 
@@ -16,13 +15,13 @@ namespace Prometheus.DotNetRuntime
         private static readonly Dictionary<CollectorRegistry, DotNetRuntimeStatsCollector> Instances = new Dictionary<CollectorRegistry, DotNetRuntimeStatsCollector>();
         
         private DotNetEventListener[] _eventListeners;
-        private readonly ImmutableHashSet<IEventSourceStatsCollector> _statsCollectors;
+        private readonly ImmutableHashSet<IEventSourceCollector> _statsCollectors;
         private readonly bool _enabledDebugging;
         private readonly Action<Exception> _errorHandler;
         private readonly CollectorRegistry _registry;
         private readonly object _lockInstance = new object();
 
-        internal DotNetRuntimeStatsCollector(ImmutableHashSet<IEventSourceStatsCollector> statsCollectors, Action<Exception> errorHandler, bool enabledDebugging, CollectorRegistry registry)
+        internal DotNetRuntimeStatsCollector(ImmutableHashSet<IEventSourceCollector> statsCollectors, Action<Exception> errorHandler, bool enabledDebugging, CollectorRegistry registry)
         {
             _statsCollectors = statsCollectors;
             _enabledDebugging = enabledDebugging;
@@ -43,7 +42,7 @@ namespace Prometheus.DotNetRuntime
         {
             var metrics = Metrics.WithCustomRegistry(registry);
 
-            foreach (var sc in _statsCollectors)
+            foreach (var sc in _statsCollectors.OfType<IEventSourceStatsCollector>())
             {
                 sc.RegisterMetrics(metrics);
             }
@@ -58,7 +57,7 @@ namespace Prometheus.DotNetRuntime
 
         public void UpdateMetrics()
         {
-            foreach (var sc in _statsCollectors)
+            foreach (var sc in _statsCollectors.OfType<IEventSourceStatsCollector>())
             {
                 try
                 {
