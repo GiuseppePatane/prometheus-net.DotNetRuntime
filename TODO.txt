@@ -29,6 +29,17 @@ Overall could be three levels of detail for most sources, ordered in terms of pe
 2. Events (info)
 3. Events (verbose)
 
+Levels are hierarchial- enabling a more detailed level implies the others are enabled.
+
+#### Ordering
+Could start at a more verbose level and have rules to selectively enable less verbose levels. Or start at the least verbose and move towards more verbose.
+
+#### Changing verbosity
+Reasons to change include:
+- A period of time has elapsed
+- A counter value has changed
+- Number of events being processed has changed
+
 Depending on the information a user wishes to obtain, switching between these three verbosity levels could be useful. Scenarios include:
 - Disabling more detailed collectors by default
 - Enabling/ disabling collectors as conditions change (e.g. a lot of exceptions are thrown then disable high-impact collection, enabling detailed thread stats when thread pool queue times increase)
@@ -37,9 +48,18 @@ Depending on the information a user wishes to obtain, switching between these th
 DotNetRuntimeStatsBuilder.LowestImpact.StartCollecting();
 DotNetRuntimeStatsBuilder.AllCollectors.StartCollecting();
 
+// This should be good enough to start, right?
 Gc.DefaultLevel(Info)
-	.Use.Verbose.When(x => x.allocRate > x, 5 second)
-	.Use.Info.When(x => x.EventsSec > 100)
+	// Should we allow multiple conditions? This could help solve the problem of different evaluation timeframes
+	.Use.Verbose.While(x => x.allocRate > x, evalPeriod: 5 second)
+	.Use.Verbose.While(x => x.startTime < DateTime.Now.AddMinutes(2))
+	.Use.Info.While(x => x.EventsSec > 100)
+	.Use.Counters.While(x => true)
+
+#### Goals of builder
+- Good documentation of what metrics can be collected at each level 
+- Well-typed- should not be allowed to enable a level that offers no benefit
+- Easy to use!
 	
 // Why are we doing this?
 // To control performance impact of collectors
@@ -52,6 +72,13 @@ Gc.DefaultLevel(Info)
 // ThreadPool: When queue length > x, num threads > Environment.ProcessorCount
 // Exceptions: When num exceptions> blah
 
+// Profiles:
+// Perf concious- I don't want performance to be destroyed by monitoring
+// Detail oriented- I want to have more insight into why my application is degrading
+// Balanced- I want more detail as long as it's not impacting the perf of my application
+
+
+
 // Levels: Info, Verbose
 DotNetRuntimeStatsBuilder.Customize()
 	.With.Gc
@@ -63,7 +90,42 @@ DotNetRuntimeStatsBuilder.Customize()
 		.Use.Normal.When(x => x.NumEventsSec > 100)
 	.With.ThreadPoolLatencyStats
 	
+Use.Gc
+	.And.Jit
+		.Use.Level.Info.Always // same effect as And
+	.And.ThreadPoolStats
+		.EnableLevel.Detailed.When(x => x).DisableWhen(x => x)
+		.EnableLevel.Info.When(x => x).DisableWhen(x => x)
+	.And.
+	
+	
 ```
+
+We are considering moving from low -> high, what about the other way around?
+Start profiling with a lot of detail
+
+Context:
+- Time since app start
+- Time since level last enabled
+- Rate of events (disable level only)
+- Relevant counters
+- 
+
+How often will these be evaluated? 
+- Counter values are evaluated, enabling higher levels of detail
+- Profilers are disabled when rate is too high or no interesting events are happening
+- Need a control mechanism that says "after enabling/ disabling, do not disable/ enable for x period of time"
+- Enable.When(<condition>).While(<condition>)For.AtLeast()/AtMost()
+- .Default(level)
+  .Use(level).When(x => x.).Until(x => x.EventsSec > 100)
+  .Use(level).When(x => x.)
+  .Use(Counters).When();
+- What do conditions do?
+	- Check rate/ sec of events (this can only be known while the thingo is active)
+	- Check event counter values
+- How often are they evaluated? 
+What is the long-term impact of starting and stopping?
+
 
 
 IDEAS:

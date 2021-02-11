@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Prometheus;
 using Prometheus.DotNetRuntime;
+using Prometheus.DotNetRuntime.StatsCollectors;
 
 namespace AspNetCoreExample
 {
@@ -21,12 +22,13 @@ namespace AspNetCoreExample
             {
                 Console.WriteLine("Enabling prometheus-net.DotNetStats...");
                 DotNetRuntimeStatsBuilder.Customize()
-                    .WithThreadPoolSchedulingStats()
-                    .WithContentionStats()
-                    .WithGcStats()
-                    .WithJitStats()
-                    .WithThreadPoolStats()
-                    .WithExceptionStats()
+                    // .WithThreadPoolSchedulingStats()
+                    // .WithContentionStats()
+                    // .WithGcStats()
+                    // .WithJitStats()
+                    // .WithThreadPoolStats()
+                    // .WithExceptionStats()
+                    .WithCustomCollector(new RuntimeCounterCollector(refreshTimeSeconds: 1))
                     .WithErrorHandler(ex => Console.WriteLine("ERROR: " + ex.ToString()))
                     .WithDebuggingMetrics(true)
                     .StartCollecting();
