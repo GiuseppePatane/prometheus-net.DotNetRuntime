@@ -16,25 +16,32 @@ namespace AspNetCoreExample
 {
     public class Program
     {
+        public static IDisposable Collector;
+        
         public static void Main(string[] args)
         {
             if (Environment.GetEnvironmentVariable("NOMON") == null)
             {
                 Console.WriteLine("Enabling prometheus-net.DotNetStats...");
-                DotNetRuntimeStatsBuilder.Customize()
-                    // .WithThreadPoolSchedulingStats()
-                    // .WithContentionStats()
-                    // .WithGcStats()
-                    // .WithJitStats()
-                    // .WithThreadPoolStats()
-                    // .WithExceptionStats()
-                    .WithCustomCollector(new RuntimeCounterCollector(refreshTimeSeconds: 1))
-                    .WithErrorHandler(ex => Console.WriteLine("ERROR: " + ex.ToString()))
-                    .WithDebuggingMetrics(true)
-                    .StartCollecting();
+                Collector = CreateCollector();
             }
 
             CreateWebHostBuilder(args).Build().Run();
+        }
+
+        public static IDisposable CreateCollector()
+        {
+            return DotNetRuntimeStatsBuilder.Default()
+                .WithThreadPoolSchedulingStats()
+                .WithContentionStats(SampleEvery.OneEvent)
+                .WithGcStats()
+                .WithJitStats(SampleEvery.OneEvent)
+                .WithThreadPoolStats()
+                .WithExceptionStats()
+                //.WithCustomCollector(new RuntimeCounterCollector(refreshTimeSeconds: 1))
+                //.WithErrorHandler(ex => Console.WriteLine("ERROR: " + ex.ToString()))
+                .WithDebuggingMetrics(true)
+                .StartCollecting();
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
